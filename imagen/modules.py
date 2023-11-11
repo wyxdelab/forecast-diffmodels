@@ -7,13 +7,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class EMA:
+class EMA:            #指数移动平均权重
     def __init__(self, beta):
         super().__init__()
-        self.beta = beta
+        self.beta = beta        #保留旧参数的比例
         self.step = 0
 
-    def update_model_average(self, ma_model, current_model):
+    def update_model_average(self, ma_model, current_model):    #ma_model旧模型，current_model新模型
         for current_params, ma_params in zip(current_model.parameters(), ma_model.parameters()):
             old_weight, up_weight = ma_params.data, current_params.data
             ma_params.data = self.update_average(old_weight, up_weight)
@@ -43,7 +43,7 @@ class SelfAttention(nn.Module):
         self.mha = nn.MultiheadAttention(channels, 4, batch_first=True)
         self.ln = nn.LayerNorm([channels])
         self.ff_self = nn.Sequential(
-            nn.LayerNorm([channels]),
+            nn.LayerNorm([channels]),    #单个通道独立的层标准化
             nn.Linear(channels, channels),
             nn.GELU(),
             nn.Linear(channels, channels),
