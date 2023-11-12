@@ -50,12 +50,12 @@ class SelfAttention(nn.Module):
         )
 
     def forward(self, x):
-        x = x.view(-1, self.channels, self.size * self.size).swapaxes(1, 2)
+        x = x.view(-1, self.channels, self.size * self.size).swapaxes(1, 2)        #(batch_size,时序长度，特征维度) 时序长度在图像处理中视为像素总数，特征维度视为通道数
         x_ln = self.ln(x)
-        attention_value, _ = self.mha(x_ln, x_ln, x_ln)
-        attention_value = attention_value + x
-        attention_value = self.ff_self(attention_value) + attention_value
-        return attention_value.swapaxes(2, 1).view(-1, self.channels, self.size, self.size)
+        attention_value, _ = self.mha(x_ln, x_ln, x_ln)        #输入的三个矩阵分别是Q，K，V
+        attention_value = attention_value + x        #残差
+        attention_value = self.ff_self(attention_value) + attention_value    #残差
+        return attention_value.swapaxes(2, 1).view(-1, self.channels, self.size, self.size)        #(batch_size,通道数，宽，高)
 
 
 class DoubleConv(nn.Module):
